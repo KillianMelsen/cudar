@@ -1,0 +1,19 @@
+CUDA_HOME = "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.3"
+R_HOME = "C:/Users/Killian/AppData/Local/R/win-library/4.2"
+R_INC = "C:/Program Files/R/R-4.2.2/include"
+RCPP_INC = $(R_HOME)/Rcpp/include
+NVCC = $(CUDA_HOME)/bin/nvcc
+CUDA_INC = $(CUDA_HOME)/include
+PKG_LIBS = -L$(CUDA_HOME)/lib/x64 -Wl,-rpath,$(CUDA_HOME)/lib/x64 -lcudart
+NVCC_FLAGS = -x cu -Xcompiler "-fPIC" -gencode arch=compute_86,code=sm_86 -I$(R_INC)
+
+### Define objects
+sharedlibs = code.obj RcppExports.obj
+sources = code.cpp RcppExports.cpp
+OBJECTS = $(sharedlibs)
+
+all : cudar.dll
+cudar.dll: $(OBJECTS)
+
+%.obj: %.cpp $(sources)
+	$(NVCC) $(NVCC_FLAGS) -I$(CUDA_INC) -I$(R_INC) -I$(RCPP_INC) $< -c

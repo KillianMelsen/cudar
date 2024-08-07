@@ -1,0 +1,13 @@
+Package: cudar
+Type: Package
+Title: cudar
+Version: 0.1
+Date: 2024-08-07
+Author: Killian A.C. Melsen
+Maintainer: Killian A.C. Melsen <name@email.nl>
+Description: A simple R package that uses Rcpp and NVIDIA's CUDA. This is a learning exercise.
+License: MIT + file LICENSE
+LinkingTo: Rcpp
+NeedsCompilation: yes
+RoxygenNote: 7.3.2
+Encoding: UTF-8

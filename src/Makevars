@@ -1,0 +1,20 @@
+CUDA_HOME = /usr/local/cuda-12.3
+R_HOME = /home/killianmelsen/R/x86_64-pc-linux-gnu-library/4.4
+CXX = /usr/bin/g++
+R_INC = /usr/share/R/include
+RCPP_INC = $(R_HOME)/Rcpp/include
+NVCC = $(CUDA_HOME)/bin/nvcc
+CUDA_INC = $(CUDA_HOME)/include
+PKG_LIBS = -L$(CUDA_HOME)/lib64 -Wl,-rpath,$(CUDA_HOME)/lib64 -lcudart
+NVCC_FLAGS = -x cu -Xcompiler "-fPIC" -gencode arch=compute_86,code=sm_86 -I$(R_INC)
+
+### Define objects
+sharedlibs = code.o RcppExports.o
+sources = code.cpp RcppExports.cpp
+OBJECTS = $(sharedlibs)
+
+all : cudar.so
+cudar.so: $(OBJECTS)
+
+%.o: %.cpp $(sources)
+	$(NVCC) $(NVCC_FLAGS) -I$(CUDA_INC) -I$(R_INC) -I$(RCPP_INC) $< -c
