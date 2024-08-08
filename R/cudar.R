@@ -9,7 +9,19 @@
 #' @export
 getDeviceProps = function(id = 0) {
   
-  rst <- .getDeviceProps(id = id)
+  # if(!is.loaded("getDeviceProperties")) {
+  #   dyn.load(system.file("lib/cudar.dll", package = "cudar"))
+  # }
+  
+  rst <- .C("getDeviceProps",
+            id = as.integer(id),
+            deviceName = raw(length = 256),
+            integr = integer(length = 1),
+            mjr = integer(length = 1),
+            mnr = integer(length = 1),
+            PACKAGE = "cudar")
+  
+  rst$DeviceName <- rawToChar(rst$deviceName)
   
   txt <- c("Found CUDA capable device.\n",
            "Device ID:\t\t%s\n",

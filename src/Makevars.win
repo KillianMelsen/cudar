@@ -1,19 +1,22 @@
-CUDA_HOME = "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.3"
-R_HOME = "C:/Users/Killian/AppData/Local/R/win-library/4.2"
-R_INC = "C:/Program Files/R/R-4.2.2/include"
-RCPP_INC = $(R_HOME)/Rcpp/include
-NVCC = $(CUDA_HOME)/bin/nvcc
+CUDA_HOME = C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.3
+R_HOME = C:/Program Files/R/R-4.2.2
+R_LIB = $(R_HOME)/bin/x64
+R_INC = $(R_HOME)/include
+NVCC = "$(CUDA_HOME)/bin/nvcc"
 CUDA_INC = $(CUDA_HOME)/include
-PKG_LIBS = -L$(CUDA_HOME)/lib/x64 -Wl,-rpath,$(CUDA_HOME)/lib/x64 -lcudart
-NVCC_FLAGS = -x cu -Xcompiler "-fPIC" -gencode arch=compute_86,code=sm_86 -I$(R_INC)
+PKG_LIBS = -L"$(CUDA_HOME)/lib/x64" -lcudart -L"$(R_LIB)" -lR
+NVCC_FLAGS = -x cu -Xcompiler "-O2" -gencode arch=compute_86,code=sm_86 -I"$(R_INC)" -I"$(CUDA_INC)"
+CXX = g++
+CXX_FLAGS = -I"$(R_INC)" -std=gnu++11
 
 ### Define objects
-sharedlibs = code.obj RcppExports.obj
-sources = code.cpp RcppExports.cpp
-OBJECTS = $(sharedlibs)
+cu_sources := $(wildcard *cu)
+cu_sharedlibs := $(patsubst %.cu, %.obj,$(cu_sources))
+
+OBJECTS = $(cu_sharedlibs)
 
 all : cudar.dll
 cudar.dll: $(OBJECTS)
 
-%.obj: %.cpp $(sources)
-	$(NVCC) $(NVCC_FLAGS) -I$(CUDA_INC) -I$(R_INC) -I$(RCPP_INC) $< -c
+code.obj: code.cu
+	$(NVCC) $(NVCC_FLAGS) -c $< -o $@
