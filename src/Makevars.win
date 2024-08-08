@@ -1,12 +1,15 @@
 CUDA_HOME = C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.3
+CUDA_INC = $(CUDA_HOME)/include
+
 R_HOME = C:/Program Files/R/R-4.2.2
 R_LIB = $(R_HOME)/bin/x64
 R_INC = $(R_HOME)/include
 RCPP_INC = C:/Users/Killian/AppData/Local/R/win-library/4.2/Rcpp/include
-NVCC = "$(CUDA_HOME)/bin/nvcc"
-CUDA_INC = $(CUDA_HOME)/include
+
 PKG_LIBS = -L"$(CUDA_HOME)/lib/x64" -lcudart -L"$(R_LIB)" -lR
-NVCC_FLAGS = -x cu -Xcompiler "-O2" -gencode arch=compute_86,code=sm_86 -I"$(R_INC)" -I"$(CUDA_INC)"
+
+NVCC = nvcc
+NVCC_FLAGS = -gencode arch=compute_86,code=sm_86 -I"$(CUDA_INC)"
 CXX = g++
 CXX_FLAGS = -I"$(R_INC)" -I"$(RCPP_INC)" -std=gnu++11
 
@@ -16,6 +19,7 @@ CUDA_sources = CUDA.cu
 OBJECTS = CPP.obj RcppExports.obj CUDA.obj
 
 all: cudar.dll
+cudar.dll: $(OBJECTS)
 
 #cudar.dll:
 #	g++ -std=gnu++11 -shared -static-libgcc -o $@ tmp.def CPP.obj RcppExports.obj CUDA.obj -L"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.3/lib/x64" -lcudart -L"C:/Program Files/R/R-4.2.2/bin/x64" -lR -L"C:/rtools42/x86_64-w64-mingw32.static.posix/lib/x64" -L"C:/rtools42/x86_64-w64-mingw32.static.posix/lib" -L"C:/Program Files/R/R-4.2.2/bin/x64" -lR
@@ -28,3 +32,5 @@ RcppExports.obj: RcppExports.cpp
 
 CUDA.obj: CUDA.cu
 	$(NVCC) $(NVCC_FLAGS) -c $< -o $@
+
+
